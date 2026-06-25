@@ -7,200 +7,149 @@
 <meta name="apple-mobile-web-app-title" content="Kickers Leer">
 <title>FC Kickers Leer</title>
 <style>
-:root{--green:#1D9E75;--green-light:#E1F5EE;--green-dark:#0F6E56;--red:#E24B4A;--red-light:#FCEBEB;--amber:#BA7517;--amber-light:#FAEEDA;--bg:#F4F4F2;--card:#FFFFFF;--text:#1a1a1a;--muted:#6b6b6b;--border:rgba(0,0,0,0.10);--radius:12px;}
-@media(prefers-color-scheme:dark){:root{--bg:#111;--card:#1e1e1e;--text:#f0f0f0;--muted:#999;--border:rgba(255,255,255,0.10);--green-light:#04342C;--red-light:#501313;--amber-light:#412402;}}
+:root{--green:#1D9E75;--green-light:#d1f0e5;--green-dark:#0F6E56;--red:#E24B4A;--red-light:#fde8e8;--amber:#BA7517;--amber-light:#fef0d5;--bg:#F4F4F2;--card:#fff;--text:#1a1a1a;--muted:#6b6b6b;--border:rgba(0,0,0,0.11);--r:12px;}
+@media(prefers-color-scheme:dark){:root{--bg:#111;--card:#1e1e1e;--text:#f0f0f0;--muted:#999;--border:rgba(255,255,255,0.11);--green-light:#04342C;--red-light:#3a1010;--amber-light:#2e1c05;}}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
-header{background:var(--green);color:#fff;padding:16px 16px 12px;position:sticky;top:0;z-index:10;}
+body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);}
+header{background:var(--green);color:#fff;padding:14px 16px;position:sticky;top:0;z-index:9;}
 header h1{font-size:17px;font-weight:600;}
-header p{font-size:12px;opacity:0.8;margin-top:2px;}
+header p{font-size:12px;opacity:.8;margin-top:2px;}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 12px 0;}
-.stat{background:var(--card);border-radius:10px;padding:10px 8px;text-align:center;}
-.stat .n{font-size:26px;font-weight:600;}
-.stat .l{font-size:11px;color:var(--muted);margin-top:1px;}
-.stat.da .n{color:var(--green);}
-.stat.ab .n{color:var(--red);}
-.stat.en .n{color:var(--amber);}
-.sessions-wrap{padding:12px 12px 0;}
-.sessions{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
-.sessions::-webkit-scrollbar{display:none;}
-.sess-btn{border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px;background:var(--card);color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;}
-.sess-btn.active{background:var(--green);border-color:var(--green);color:#fff;font-weight:600;}
-.add-sess-btn{border:1px dashed var(--border);border-radius:20px;padding:6px 14px;font-size:13px;background:transparent;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;}
-.section-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:14px 16px 6px;}
-.player-list{display:flex;flex-direction:column;gap:6px;padding:0 12px;}
-.player-row{background:var(--card);border-radius:var(--radius);padding:10px 12px;display:flex;align-items:center;gap:10px;border:1px solid var(--border);}
-.avatar{width:38px;height:38px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--muted);flex-shrink:0;}
-.pname{flex:1;font-size:14px;font-weight:500;}
-.status-btns{display:flex;gap:4px;}
-.sb{border:1px solid var(--border);border-radius:8px;padding:6px 9px;font-size:12px;cursor:pointer;background:transparent;color:var(--muted);font-weight:500;}
-.sb.da{background:var(--green-light);border-color:var(--green);color:var(--green-dark);}
-.sb.ab{background:var(--red-light);border-color:var(--red);color:var(--red);}
-.sb.en{background:var(--amber-light);border-color:var(--amber);color:var(--amber);}
-.add-player-wrap{padding:14px 12px 4px;display:flex;gap:6px;}
-.add-player-wrap input{flex:1;border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:14px;background:var(--card);color:var(--text);}
-.add-player-wrap button{border:none;border-radius:10px;padding:10px 16px;font-size:18px;background:var(--green);color:#fff;cursor:pointer;}
-.export-wrap{padding:16px 12px 32px;}
-.export-btn{width:100%;border:1px solid var(--border);border-radius:var(--radius);padding:13px;font-size:15px;background:var(--card);color:var(--text);cursor:pointer;font-weight:500;}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:100;white-space:nowrap;}
-.toast.show{opacity:1;}
+.stat{background:var(--card);border-radius:10px;padding:10px 6px;text-align:center;}
+.stat .n{font-size:26px;font-weight:700;}
+.stat .l{font-size:11px;color:var(--muted);}
+#cnt-da{color:var(--green);}#cnt-ab{color:var(--red);}#cnt-en{color:var(--amber);}
+.sw{padding:10px 12px 0;}
+.sb-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;}
+.sb-row::-webkit-scrollbar{display:none;}
+.tb{border:1px solid var(--border);border-radius:20px;padding:6px 13px;font-size:13px;background:var(--card);color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.tb.on{background:var(--green);border-color:var(--green);color:#fff;font-weight:600;}
+.tb.add{border-style:dashed;}
+.sl{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:12px 16px 5px;}
+.pl{display:flex;flex-direction:column;gap:5px;padding:0 12px;}
+.pr{background:var(--card);border-radius:var(--r);padding:9px 11px;display:flex;align-items:center;gap:9px;border:1px solid var(--border);}
+.av{width:36px;height:36px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--muted);flex-shrink:0;}
+.pn{flex:1;font-size:13px;font-weight:500;}
+.sb{display:flex;gap:3px;}
+.sb button{border:1px solid var(--border);border-radius:7px;padding:5px 8px;font-size:12px;cursor:pointer;background:transparent;color:var(--muted);font-weight:500;}
+.sb button.da{background:var(--green-light);border-color:var(--green);color:var(--green-dark);}
+.sb button.ab{background:var(--red-light);border-color:var(--red);color:var(--red);}
+.sb button.en{background:var(--amber-light);border-color:var(--amber);color:var(--amber);}
+.ai{padding:12px 12px 4px;display:flex;gap:6px;}
+.ai input{flex:1;border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:14px;background:var(--card);color:var(--text);}
+.ai button{border:none;border-radius:10px;padding:9px 15px;font-size:17px;background:var(--green);color:#fff;cursor:pointer;}
+.ep{padding:14px 12px 30px;}
+.ep button{width:100%;border:1px solid var(--border);border-radius:var(--r);padding:13px;font-size:15px;background:var(--card);color:var(--text);cursor:pointer;font-weight:500;}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:9px 18px;border-radius:18px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:99;white-space:nowrap;}
+#toast.show{opacity:1;}
 </style>
 </head>
 <body>
 <header>
   <h1>&#x26BD; FC Kickers Leer</h1>
-  <p id="session-label">Vorbereitung 26/27 &middot; Termin w&auml;hlen</p>
+  <p id="slabel">Vorbereitung 26/27</p>
 </header>
 <div class="stats">
-  <div class="stat da"><div class="n" id="cnt-da">0</div><div class="l">Dabei</div></div>
-  <div class="stat ab"><div class="n" id="cnt-ab">0</div><div class="l">Fehlt</div></div>
-  <div class="stat en"><div class="n" id="cnt-en">0</div><div class="l">Entsch.</div></div>
+  <div class="stat"><div class="n" id="cnt-da">0</div><div class="l">Dabei</div></div>
+  <div class="stat"><div class="n" id="cnt-ab">0</div><div class="l">Fehlt</div></div>
+  <div class="stat"><div class="n" id="cnt-en">0</div><div class="l">Entsch.</div></div>
 </div>
-<div class="sessions-wrap"><div class="sessions" id="sessions-bar"></div></div>
-<div class="section-label">Spieler</div>
-<div class="player-list" id="player-list"></div>
-<div class="section-label">Trainerstab &amp; Betreuer</div>
-<div class="player-list" id="staff-list"></div>
-<div class="add-player-wrap">
-  <input id="new-name" placeholder="Spieler hinzuf&uuml;gen..." />
-  <button onclick="addPlayer()">+</button>
+<div class="sw"><div class="sb-row" id="sbar"></div></div>
+<div class="sl">Spieler</div>
+<div class="pl" id="plist"></div>
+<div class="sl">Trainerstab &amp; Betreuer</div>
+<div class="pl" id="slist"></div>
+<div class="ai">
+  <input id="nn" placeholder="Spieler hinzuf&#252;gen...">
+  <button onclick="addP()">+</button>
 </div>
-<div class="export-wrap">
-  <button class="export-btn" onclick="exportList()">&#x1F4CB; Liste kopieren</button>
-</div>
-<div class="toast" id="toast"></div>
-
+<div class="ep"><button onclick="doExport()">&#x1F4CB; Liste kopieren</button></div>
+<div id="toast"></div>
 <script>
-var rawDates=[46199,46200,46201,46204,46206,46208,46209,46211,46213,46215,46216,46218,46220,46222,46223,46225,46227];
-function fmtDate(s){var d=new Date((s-25569)*86400*1000);return d.toLocaleDateString("de-DE",{weekday:"short",day:"2-digit",month:"2-digit"});}
-var sessions=rawDates.map(function(s){return {label:fmtDate(s)};});
-var curSess=0;
+var DATES=[46199,46200,46201,46204,46206,46208,46209,46211,46213,46215,46216,46218,46220,46222,46223,46225,46227];
+function fd(s){var d=new Date((s-25569)*86400*1000);return d.toLocaleDateString("de-DE",{weekday:"short",day:"2-digit",month:"2-digit"});}
+var sess=DATES.map(function(s){return fd(s);});
+var cur=0;
 
-var defaultPlayers=["John Lucker","Mirco Behle","S\u00f6ren Bu\u00df","Erhan Colak","Marvin Dunayski","Jann Melcher","Mo Juma","Khaled Algarad","Ridvan Karakurt","Timo L\u00fcdemann","Aron M\u00fcseler","Noah Omar-Diriye","Gerrit Remmers","Jonas Weber","Manuel Westmark","Passo Wagner","Rojhat \u00d6zdemir"];
-var defaultStaff=["Basti Fischer","Holger Dunayski","Micha","Christian"];
+var DP=["John Lucker","Mirco Behle","S\u00f6ren Bu\u00df","Erhan Colak","Marvin Dunayski","Jann Melcher","Mo Juma","Khaled Algarad","Ridvan Karakurt","Timo L\u00fcdemann","Aron M\u00fcseler","Noah Omar-Diriye","Gerrit Remmers","Jonas Weber","Manuel Westmark","Passo Wagner","Rojhat \u00d6zdemir"];
+var DS=["Basti Fischer","Holger Dunayski","Micha","Christian"];
 
-var players=defaultPlayers.map(function(n){return {name:n,status:{}};});
-var staff=defaultStaff.map(function(n){return {name:n,status:{}};});
+var pl=DP.map(function(n){return{name:n,st:{}};});
+var sl=DS.map(function(n){return{name:n,st:{}};});
 
-function tryLoad(){
-  try{
-    var p=localStorage.getItem("kickers_p");
-    var s=localStorage.getItem("kickers_s");
-    if(p){var pp=JSON.parse(p);if(pp&&pp.length>0)players=pp;}
-    if(s){var ss=JSON.parse(s);if(ss&&ss.length>0)staff=ss;}
-  }catch(e){}
-}
+function ini(n){return n.split(" ").map(function(w){return w[0];}).join("").slice(0,2).toUpperCase();}
 
-function trySave(){
-  try{localStorage.setItem("kickers_p",JSON.stringify(players));localStorage.setItem("kickers_s",JSON.stringify(staff));}catch(e){}
-}
+function tog(arr,i,v){arr[i].st[cur]=(arr[i].st[cur]===v?"":v);save();draw();}
+window.sp=function(i,v){tog(pl,i,v);};
+window.ss=function(i,v){tog(sl,i,v);};
 
-function initials(n){return n.split(" ").map(function(w){return w[0];}).join("").slice(0,2).toUpperCase();}
-
-function toggle(arr,i,val){
-  arr[i].status[curSess]=(arr[i].status[curSess]===val?"":val);
-  trySave();render();
-}
-function setP(i,v){toggle(players,i,v);}
-function setS(i,v){toggle(staff,i,v);}
-
-function renderList(id,arr,fn){
-  var el=document.getElementById(id);
-  var html="";
+function mkList(el,arr,fn){
+  var h="";
   for(var i=0;i<arr.length;i++){
-    var st=arr[i].status[curSess]||"";
-    html+='<div class="player-row">'
-      +'<div class="avatar">'+initials(arr[i].name)+'</div>'
-      +'<div class="pname">'+arr[i].name+'</div>'
-      +'<div class="status-btns">'
-      +'<button class="sb'+(st==="da"?" da":"')+'" onclick="'+fn+'('+i+',\'da\')">&#x2713; Da</button>'
-      +'<button class="sb'+(st==="en"?" en":"'")+'" onclick="'+fn+'('+i+',\'en\')">Entsch.</button>'
-      +'<button class="sb'+(st==="ab"?" ab":"'")+'" onclick="'+fn+'('+i+',\'ab\')">&#x2715; Fehlt</button>'
-      +'</div></div>';
+    var s=arr[i].st[cur]||"";
+    h+='<div class="pr"><div class="av">'+ini(arr[i].name)+'</div>'
+     +'<div class="pn">'+arr[i].name+'</div>'
+     +'<div class="sb">'
+     +'<button class="'+(s==="da"?"da":"")+'" onclick="'+fn+'('+i+',\'da\')">&#x2713; Da</button>'
+     +'<button class="'+(s==="en"?"en":"")+'" onclick="'+fn+'('+i+',\'en\')">Entsch.</button>'
+     +'<button class="'+(s==="ab"?"ab":"")+'" onclick="'+fn+'('+i+',\'ab\')">&#x2715; Fehlt</button>'
+     +'</div></div>';
   }
-  el.innerHTML=html;
+  document.getElementById(el).innerHTML=h;
 }
 
-function render(){
-  renderList("player-list",players,"setP");
-  renderList("staff-list",staff,"setS");
-  var all=players.concat(staff);
-  var da=0,ab=0,en=0;
-  for(var i=0;i<all.length;i++){
-    var st=all[i].status[curSess]||"";
-    if(st==="da")da++;else if(st==="ab")ab++;else if(st==="en")en++;
-  }
+function draw(){
+  mkList("plist",pl,"sp");
+  mkList("slist",sl,"ss");
+  var all=pl.concat(sl),da=0,ab=0,en=0;
+  for(var i=0;i<all.length;i++){var s=all[i].st[cur]||"";if(s==="da")da++;else if(s==="ab")ab++;else if(s==="en")en++;}
   document.getElementById("cnt-da").textContent=da;
   document.getElementById("cnt-ab").textContent=ab;
   document.getElementById("cnt-en").textContent=en;
-  buildBar();
+  buildSBar();
 }
 
-function buildBar(){
-  var bar=document.getElementById("sessions-bar");
-  var html="";
-  for(var i=0;i<sessions.length;i++){
-    html+='<button class="sess-btn'+(i===curSess?" active":"")+'" onclick="switchSession('+i+')">'+sessions[i].label+'</button>';
+function buildSBar(){
+  var bar=document.getElementById("sbar");
+  var h="";
+  for(var i=0;i<sess.length;i++){
+    h+='<button class="tb'+(i===cur?" on":"")+'" onclick="go('+i+')">'+sess[i]+'</button>';
   }
-  bar.innerHTML=html;
-  var add=document.createElement("button");
-  add.className="add-sess-btn";
-  add.textContent="+ Termin";
-  add.onclick=function(){
-    var lbl=prompt("Datum eingeben (z.B. Mo. 14.07.):");
-    if(!lbl)return;
-    sessions.push({label:lbl});
-    switchSession(sessions.length-1);
-  };
-  bar.appendChild(add);
+  bar.innerHTML=h;
+  var a=document.createElement("button");
+  a.className="tb add";a.textContent="+ Termin";
+  a.onclick=function(){var l=prompt("Datum (z.B. Mo. 14.07.):");if(!l)return;sess.push(l);go(sess.length-1);};
+  bar.appendChild(a);
 }
 
-function switchSession(idx){
-  curSess=idx;
-  document.getElementById("session-label").textContent="Vorbereitung 26/27 \u00b7 "+sessions[idx].label;
-  render();
+function go(i){
+  cur=i;
+  document.getElementById("slabel").textContent="Vorbereitung 26/27 \u00b7 "+sess[i];
+  draw();
 }
 
-function addPlayer(){
-  var name=document.getElementById("new-name").value.trim();
-  if(!name)return;
-  players.push({name:name,status:{}});
-  document.getElementById("new-name").value="";
-  trySave();render();
-  showToast(name+" hinzugef\u00fcgt");
+function addP(){
+  var n=document.getElementById("nn").value.trim();
+  if(!n)return;
+  pl.push({name:n,st:{}});
+  document.getElementById("nn").value="";
+  save();draw();toast(n+" hinzugef\u00fcgt");
 }
 
-function exportList(){
-  var s=sessions[curSess];
+function doExport(){
   var da=[],ab=[],en=[];
-  for(var i=0;i<players.length;i++){
-    var st=players[i].status[curSess]||"";
-    if(st==="da")da.push(players[i].name);
-    else if(st==="ab")ab.push(players[i].name);
-    else if(st==="en")en.push(players[i].name);
-  }
-  var txt="FC Kickers Leer \u2013 Vorbereitung 26/27\n"+s.label+"\n\n\u2705 Dabei ("+da.length+"):\n"+(da.join("\n")||"\u2014")+"\n\n\u274C Fehlt ("+ab.length+"):\n"+(ab.join("\n")||"\u2014")+"\n\n\u26A0\uFE0F Entschuldigt ("+en.length+"):\n"+(en.join("\n")||"\u2014");
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(txt).then(function(){showToast("Kopiert!");}).catch(function(){fallback(txt);});
-  }else{fallback(txt);}
+  for(var i=0;i<pl.length;i++){var s=pl[i].st[cur]||"";if(s==="da")da.push(pl[i].name);else if(s==="ab")ab.push(pl[i].name);else if(s==="en")en.push(pl[i].name);}
+  var txt="FC Kickers Leer \u2013 Vorbereitung 26/27\n"+sess[cur]+"\n\n\u2705 Dabei ("+da.length+"):\n"+(da.join("\n")||"\u2014")+"\n\n\u274c Fehlt ("+ab.length+"):\n"+(ab.join("\n")||"\u2014")+"\n\n\u26a0\ufe0f Entschuldigt ("+en.length+"):\n"+(en.join("\n")||"\u2014");
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){toast("Kopiert!");}).catch(function(){fb(txt);});}else{fb(txt);}
 }
+function fb(t){var x=document.createElement("textarea");x.value=t;x.style.cssText="position:fixed;opacity:0;";document.body.appendChild(x);x.select();try{document.execCommand("copy");toast("Kopiert!");}catch(e){alert(t);}document.body.removeChild(x);}
 
-function fallback(txt){
-  var ta=document.createElement("textarea");
-  ta.value=txt;ta.style.cssText="position:fixed;top:0;left:0;opacity:0;";
-  document.body.appendChild(ta);ta.focus();ta.select();
-  try{document.execCommand("copy");showToast("Kopiert!");}catch(e){alert(txt);}
-  document.body.removeChild(ta);
-}
+function toast(m){var t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(function(){t.classList.remove("show");},2200);}
 
-function showToast(msg){
-  var t=document.getElementById("toast");
-  t.textContent=msg;t.classList.add("show");
-  setTimeout(function(){t.classList.remove("show");},2500);
-}
+function save(){try{localStorage.setItem("kl_pl",JSON.stringify(pl));localStorage.setItem("kl_sl",JSON.stringify(sl));}catch(e){}}
+function load(){try{var p=localStorage.getItem("kl_pl");var s=localStorage.getItem("kl_sl");if(p){var pp=JSON.parse(p);if(pp&&pp.length)pl=pp;}if(s){var ss=JSON.parse(s);if(ss&&ss.length)sl=ss;}}catch(e){}}
 
-tryLoad();
-switchSession(0);
+load();go(0);
 </script>
 </body>
 </html>
