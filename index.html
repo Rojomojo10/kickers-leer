@@ -13,7 +13,9 @@
 body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);}
 header{background:var(--green);color:#fff;padding:14px 16px;position:sticky;top:0;z-index:9;}
 header h1{font-size:17px;font-weight:600;}
-header p{font-size:12px;opacity:.8;margin-top:2px;}
+header p{font-size:12px;opacity:.8;margin-top:2px;display:flex;align-items:center;gap:6px;}
+.dot{width:7px;height:7px;border-radius:50%;background:#fff;opacity:.5;display:inline-block;}
+.dot.on{opacity:1;background:#a8ffdc;}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 12px 0;}
 .stat{background:var(--card);border-radius:10px;padding:10px 6px;text-align:center;}
 .stat .n{font-size:26px;font-weight:700;}
@@ -47,7 +49,7 @@ header p{font-size:12px;opacity:.8;margin-top:2px;}
 <body>
 <header>
   <h1>&#x26BD; FC Kickers Leer</h1>
-  <p id="slabel">Vorbereitung 26/27</p>
+  <p><span class="dot" id="dot"></span><span id="slabel">Vorbereitung 26/27</span></p>
 </header>
 <div class="stats">
   <div class="stat"><div class="n" id="cnt-da">0</div><div class="l">Dabei</div></div>
@@ -65,7 +67,24 @@ header p{font-size:12px;opacity:.8;margin-top:2px;}
 </div>
 <div class="ep"><button onclick="doExport()">&#x1F4CB; Liste kopieren</button></div>
 <div id="toast"></div>
-<script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAyWwFs2a9Fv9hVu-mDbfsKUDBGNiwKewg",
+  authDomain: "kickers-a6150.firebaseapp.com",
+  databaseURL: "https://kickers-a6150-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "kickers-a6150",
+  storageBucket: "kickers-a6150.firebasestorage.app",
+  messagingSenderId: "544380591297",
+  appId: "1:544380591297:web:9f908968ee054c9d45c840"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
 var DATES=[46199,46200,46201,46204,46206,46208,46209,46211,46213,46215,46216,46218,46220,46222,46223,46225,46227];
 function fd(s){var d=new Date((s-25569)*86400*1000);return d.toLocaleDateString("de-DE",{weekday:"short",day:"2-digit",month:"2-digit"});}
 var sess=DATES.map(function(s){return fd(s);});
@@ -76,10 +95,14 @@ var DS=["Basti Fischer","Holger Dunayski","Micha","Christian"];
 
 var pl=DP.map(function(n){return{name:n,st:{}};});
 var sl=DS.map(function(n){return{name:n,st:{}};});
+var synced=false;
 
 function ini(n){return n.split(" ").map(function(w){return w[0];}).join("").slice(0,2).toUpperCase();}
 
-function tog(arr,i,v){arr[i].st[cur]=(arr[i].st[cur]===v?"":v);save();draw();}
+function tog(arr,i,v){
+  arr[i].st[cur]=(arr[i].st[cur]===v?"":v);
+  save();draw();
+}
 window.sp=function(i,v){tog(pl,i,v);};
 window.ss=function(i,v){tog(sl,i,v);};
 
@@ -146,10 +169,22 @@ function fb(t){var x=document.createElement("textarea");x.value=t;x.style.cssTex
 
 function toast(m){var t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(function(){t.classList.remove("show");},2200);}
 
-function save(){try{localStorage.setItem("kl_pl",JSON.stringify(pl));localStorage.setItem("kl_sl",JSON.stringify(sl));}catch(e){}}
-function load(){try{var p=localStorage.getItem("kl_pl");var s=localStorage.getItem("kl_sl");if(p){var pp=JSON.parse(p);if(pp&&pp.length)pl=pp;}if(s){var ss=JSON.parse(s);if(ss&&ss.length)sl=ss;}}catch(e){}}
+function save(){
+  set(ref(db,"anwesenheit"),{pl:pl,sl:sl,sess:sess});
+}
 
-load();go(0);
+onValue(ref(db,"anwesenheit"),function(snapshot){
+  var data=snapshot.val();
+  if(data){
+    if(data.pl&&data.pl.length){pl=data.pl;}
+    if(data.sl&&data.sl.length){sl=data.sl;}
+    if(data.sess&&data.sess.length){sess=data.sess;}
+  }
+  if(!synced){synced=true;document.getElementById("dot").classList.add("on");}
+  draw();
+});
+
+go(0);
 </script>
 </body>
 </html>
