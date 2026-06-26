@@ -8,13 +8,13 @@
 <title>FC Kickers Leer</title>
 <style>
 :root{--green:#1D9E75;--gl:#d1f0e5;--gd:#0F6E56;--red:#E24B4A;--rl:#fde8e8;--amb:#BA7517;--al:#fef0d5;--bg:#F4F4F2;--card:#fff;--text:#1a1a1a;--muted:#6b6b6b;--border:rgba(0,0,0,0.11);--r:12px;}
-@media(prefers-color-scheme:dark){:root{--bg:#111;--card:#1e1e1e;--text:#f0f0f0;--muted:#999;--border:rgba(255,255,255,0.11);--gl:#04342C;--rl:#3a1010;--al:#2e1c05;}}
+@media(prefers-color-scheme:dark){:root{--bg:#111;--card:#1e1e1e;--text:#f0f0f0;--muted:#999;--border:rgba(255,255,255,0.11);--gl:#0a3d2a;--rl:#3a1010;--al:#2e1c05;}}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);}
 header{background:var(--green);color:#fff;padding:14px 16px;position:sticky;top:0;z-index:9;}
 header h1{font-size:17px;font-weight:600;}
-header p{font-size:12px;opacity:.8;margin-top:2px;}
-.dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.4);display:inline-block;margin-right:5px;vertical-align:middle;}
+header p{font-size:12px;opacity:.85;margin-top:3px;display:flex;align-items:center;gap:6px;}
+.dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.35);flex-shrink:0;}
 .dot.on{background:#a8ffdc;}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 12px 0;}
 .stat{background:var(--card);border-radius:10px;padding:10px 6px;text-align:center;}
@@ -22,30 +22,28 @@ header p{font-size:12px;opacity:.8;margin-top:2px;}
 .stat .l{font-size:11px;color:var(--muted);}
 #cnt-da{color:var(--green);}#cnt-ab{color:var(--red);}#cnt-en{color:var(--amb);}
 .sw{padding:10px 12px 0;}
-.sr{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;}
+.sr{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
 .sr::-webkit-scrollbar{display:none;}
 .tb{border:1px solid var(--border);border-radius:20px;padding:6px 13px;font-size:13px;background:var(--card);color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;}
 .tb.on{background:var(--green);border-color:var(--green);color:#fff;font-weight:600;}
 .tb.add{border-style:dashed;}
 .sl{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:12px 16px 5px;}
 .pl{display:flex;flex-direction:column;gap:5px;padding:0 12px;}
-.pr{background:var(--card);border-radius:var(--r);padding:9px 11px;display:flex;align-items:center;gap:9px;border:1px solid var(--border);transition:background .15s,border-color .15s;}
+.pr{background:var(--card);border-radius:var(--r);padding:10px 12px;display:flex;align-items:center;gap:10px;border:2px solid transparent;transition:background .15s,border-color .15s;}
 .pr.da{background:var(--gl);border-color:var(--green);}
 .pr.ab{background:var(--rl);border-color:var(--red);}
 .pr.en{background:var(--al);border-color:var(--amb);}
-.av{width:36px;height:36px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--muted);flex-shrink:0;}
-.pr.da .av{background:rgba(255,255,255,0.5);}
-.pr.ab .av{background:rgba(255,255,255,0.5);}
-.pr.en .av{background:rgba(255,255,255,0.5);}
-.pn{flex:1;font-size:13px;font-weight:500;}
+.av{width:36px;height:36px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--muted);flex-shrink:0;}
+.pr.da .av,.pr.ab .av,.pr.en .av{background:rgba(255,255,255,0.45);}
+.pn{flex:1;font-size:14px;font-weight:500;}
 .sb{display:flex;gap:3px;}
-.sb button{border:1px solid var(--border);border-radius:7px;padding:5px 8px;font-size:12px;cursor:pointer;background:rgba(255,255,255,0.7);color:var(--muted);font-weight:500;}
+.sb button{border:1.5px solid var(--border);border-radius:7px;padding:6px 9px;font-size:12px;cursor:pointer;background:var(--card);color:var(--muted);font-weight:600;min-width:44px;}
 .sb button.da{background:var(--green);border-color:var(--green);color:#fff;}
 .sb button.ab{background:var(--red);border-color:var(--red);color:#fff;}
 .sb button.en{background:var(--amb);border-color:var(--amb);color:#fff;}
 .ai{padding:12px 12px 4px;display:flex;gap:6px;}
 .ai input{flex:1;border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:14px;background:var(--card);color:var(--text);}
-.ai button{border:none;border-radius:10px;padding:9px 15px;font-size:17px;background:var(--green);color:#fff;cursor:pointer;}
+.ai button{border:none;border-radius:10px;padding:9px 15px;font-size:17px;background:var(--green);color:#fff;cursor:pointer;font-weight:700;}
 .ep{padding:14px 12px 30px;}
 .ep button{width:100%;border:1px solid var(--border);border-radius:var(--r);padding:13px;font-size:15px;background:var(--card);color:var(--text);cursor:pointer;font-weight:500;}
 #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:9px 18px;border-radius:18px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:99;white-space:nowrap;}
@@ -73,20 +71,8 @@ header p{font-size:12px;opacity:.8;margin-top:2px;}
 </div>
 <div class="ep"><button onclick="doExport()">&#x1F4CB; Liste kopieren</button></div>
 <div id="toast"></div>
-
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script>
-firebase.initializeApp({
-  apiKey:"AIzaSyAyWwFs2a9Fv9hVu-mDbfsKUDBGNiwKewg",
-  authDomain:"kickers-a6150.firebaseapp.com",
-  databaseURL:"https://kickers-a6150-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId:"kickers-a6150",
-  storageBucket:"kickers-a6150.firebasestorage.app",
-  messagingSenderId:"544380591297",
-  appId:"1:544380591297:web:9f908968ee054c9d45c840"
-});
-var db = firebase.database();
+var GS = "https://script.google.com/macros/s/AKfycbyHUi68dFMedT6A2JEVFnZuQvOXj6foSYdqCzdyOwcfm_ee92E0UOPlQF-rJdXuaflg/exec";
 
 var SPIELER = ["John Lucker","Mirco Behle","S\u00f6ren Bu\u00df","Erhan Colak","Marvin Dunayski","Jann Melcher","Mo Juma","Khaled Algarad","Ridvan Karakurt","Timo L\u00fcdemann","Aron M\u00fcseler","Noah Omar-Diriye","Gerrit Remmers","Jonas Weber","Manuel Westmark","Passo Wagner","Rojhat \u00d6zdemir"];
 var STAFF   = ["Basti Fischer","Holger Dunayski","Micha","Christian"];
@@ -95,22 +81,17 @@ function fd(s){var d=new Date((s-25569)*86400*1000);return d.toLocaleDateString(
 var SESS = DATES.map(fd);
 var cur = 0;
 
-// status[sessIdx][key] = "da"|"ab"|"en"|""
+// status[sessIdx_playerKey] = "da"|"ab"|"en"
 var status = {};
 
-function k(isStaff,i){ return (isStaff?"s":"p")+i; }
-function getS(isStaff,i){ return (status[cur]&&status[cur][k(isStaff,i)])||""; }
+function k(isStaff,i){ return cur+"_"+(isStaff?"s":"p")+i; }
+function getS(isStaff,i){ return status[k(isStaff,i)]||""; }
 
 function tog(isStaff,i,v){
-  if(!status[cur]) status[cur]={};
   var key=k(isStaff,i);
-  var cur_val=status[cur][key]||"";
-  status[cur][key] = (cur_val===v ? "" : v);
+  status[key] = (status[key]===v ? "" : v);
   draw();
-  saving=true;
-  db.ref("st/"+cur+"/"+key).set(status[cur][key]||null,function(){
-    setTimeout(function(){saving=false;},1500);
-  });
+  saveToSheet();
 }
 window.sp=function(i,v){tog(false,i,v);};
 window.ss=function(i,v){tog(true,i,v);};
@@ -122,7 +103,7 @@ function mkList(el,names,isStaff){
   for(var i=0;i<names.length;i++){
     var s=getS(isStaff,i);
     var fn=isStaff?"ss":"sp";
-    h+='<div class="pr'+(s?' '+s:'')+'">'
+    h+='<div class="pr'+(s?" "+s:"")+'">'
       +'<div class="av">'+ini(names[i])+'</div>'
       +'<div class="pn">'+names[i]+'</div>'
       +'<div class="sb">'
@@ -164,15 +145,29 @@ function go(i){
   draw();
 }
 
-// Firebase live sync
-var saving=false;
-db.ref("st").on("value",function(snap){
-  document.getElementById("dot").classList.add("on");
-  if(saving) return; // eigenes Echo ignorieren
-  var data=snap.val()||{};
-  status=data;
-  draw();
-});
+// Google Sheets speichern
+function saveToSheet(){
+  var rows=[["key","value"]];
+  Object.keys(status).forEach(function(k){if(status[k])rows.push([k,status[k]]);});
+  fetch(GS,{method:"POST",body:JSON.stringify(rows)}).catch(function(){});
+}
+
+// Google Sheets laden
+function loadFromSheet(){
+  fetch(GS+"?t="+Date.now())
+    .then(function(r){return r.json();})
+    .then(function(rows){
+      status={};
+      for(var i=1;i<rows.length;i++){
+        if(rows[i][0]&&rows[i][1]) status[rows[i][0]]=rows[i][1];
+      }
+      document.getElementById("dot").classList.add("on");
+      draw();
+    })
+    .catch(function(){
+      document.getElementById("slabel").textContent="Vorbereitung 26/27 \u00b7 offline";
+    });
+}
 
 function addP(){
   var n=document.getElementById("nn").value.trim();
@@ -186,13 +181,17 @@ function doExport(){
   var da=[],ab=[],en=[];
   for(var i=0;i<SPIELER.length;i++){var s=getS(false,i);if(s==="da")da.push(SPIELER[i]);else if(s==="ab")ab.push(SPIELER[i]);else if(s==="en")en.push(SPIELER[i]);}
   var txt="FC Kickers Leer \u2013 Vorbereitung 26/27\n"+SESS[cur]+"\n\n\u2705 Dabei ("+da.length+"):\n"+(da.join("\n")||"\u2014")+"\n\n\u274c Fehlt ("+ab.length+"):\n"+(ab.join("\n")||"\u2014")+"\n\n\u26a0\ufe0f Entschuldigt ("+en.length+"):\n"+(en.join("\n")||"\u2014");
-  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){toast("Kopiert!");}).catch(function(){fb2(txt);});}else{fb2(txt);}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){toast("Kopiert!");}).catch(function(){fb(txt);});}else{fb(txt);}
 }
-function fb2(t){var x=document.createElement("textarea");x.value=t;x.style.cssText="position:fixed;opacity:0;";document.body.appendChild(x);x.select();try{document.execCommand("copy");toast("Kopiert!");}catch(e){alert(t);}document.body.removeChild(x);}
+function fb(t){var x=document.createElement("textarea");x.value=t;x.style.cssText="position:fixed;opacity:0;";document.body.appendChild(x);x.select();try{document.execCommand("copy");toast("Kopiert!");}catch(e){alert(t);}document.body.removeChild(x);}
 function toast(m){var t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(function(){t.classList.remove("show");},2200);}
 
+// Start
 draw();
 go(0);
+loadFromSheet();
+// alle 30 Sekunden neu laden für Sync
+setInterval(loadFromSheet, 30000);
 </script>
 </body>
 </html>
