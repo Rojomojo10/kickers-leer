@@ -49,12 +49,12 @@ header p{font-size:12px;opacity:.8;margin-top:2px;}
 <body>
 <header>
   <h1>&#x26BD; FC Kickers Leer</h1>
-  <p><span class="dot" id="dot"></span><span id="slabel">Vorbereitung 26/27 &middot; wird geladen...</span></p>
+  <p><span class="dot" id="dot"></span><span id="slabel">Vorbereitung 26/27</span></p>
 </header>
 <div class="stats">
-  <div class="stat"><div class="n" id="cnt-da">-</div><div class="l">Dabei</div></div>
-  <div class="stat"><div class="n" id="cnt-ab">-</div><div class="l">Fehlt</div></div>
-  <div class="stat"><div class="n" id="cnt-en">-</div><div class="l">Entsch.</div></div>
+  <div class="stat"><div class="n" id="cnt-da">0</div><div class="l">Dabei</div></div>
+  <div class="stat"><div class="n" id="cnt-ab">0</div><div class="l">Fehlt</div></div>
+  <div class="stat"><div class="n" id="cnt-en">0</div><div class="l">Entsch.</div></div>
 </div>
 <div class="sw"><div class="sr" id="sbar"></div></div>
 <div class="sl">Spieler</div>
@@ -80,175 +80,126 @@ firebase.initializeApp({
   messagingSenderId:"544380591297",
   appId:"1:544380591297:web:9f908968ee054c9d45c840"
 });
-var db=firebase.database();
+var db = firebase.database();
 
-var DATES=[46199,46200,46201,46204,46206,46208,46209,46211,46213,46215,46216,46218,46220,46222,46223,46225,46227];
+// Namen fest in der App — unabhängig von Firebase
+var SPIELER = ["John Lucker","Mirco Behle","S\u00f6ren Bu\u00df","Erhan Colak","Marvin Dunayski","Jann Melcher","Mo Juma","Khaled Algarad","Ridvan Karakurt","Timo L\u00fcdemann","Aron M\u00fcseler","Noah Omar-Diriye","Gerrit Remmers","Jonas Weber","Manuel Westmark","Passo Wagner","Rojhat \u00d6zdemir"];
+var STAFF   = ["Basti Fischer","Holger Dunayski","Micha","Christian"];
+var DATES   = [46199,46200,46201,46204,46206,46208,46209,46211,46213,46215,46216,46218,46220,46222,46223,46225,46227];
+
 function fd(s){var d=new Date((s-25569)*86400*1000);return d.toLocaleDateString("de-DE",{weekday:"short",day:"2-digit",month:"2-digit"});}
+var SESS = DATES.map(fd);
 
-var DEFAULT_SESS=DATES.map(fd);
-var DEFAULT_PL=["John Lucker","Mirco Behle","S\u00f6ren Bu\u00df","Erhan Colak","Marvin Dunayski","Jann Melcher","Mo Juma","Khaled Algarad","Ridvan Karakurt","Timo L\u00fcdemann","Aron M\u00fcseler","Noah Omar-Diriye","Gerrit Remmers","Jonas Weber","Manuel Westmark","Passo Wagner","Rojhat \u00d6zdemir"];
-var DEFAULT_SL=["Basti Fischer","Holger Dunayski","Micha","Christian"];
+// Anwesenheitsdaten: status[sessionIndex][playerKey] = "da"|"ab"|"en"
+var status = {};
+var cur = 0;
 
-var sess=DEFAULT_SESS.slice();
-var pl=DEFAULT_PL.map(function(n){return{name:n,st:{}};});
-var sl=DEFAULT_SL.map(function(n){return{name:n,st:{}};});
-var cur=0;
-var listening=false;
+function key(isStaff, i){ return (isStaff ? "s" : "p") + i; }
 
-// Firebase Array → sauberes Objekt konvertieren
-function fixSt(p){
-  if(!p||typeof p!=="object") return{name:p||"",st:{}};
-  var st=p.st||{};
-  // Falls Firebase Array draus gemacht hat, in Objekt umwandeln
-  if(Array.isArray(st)){
-    var obj={};
-    for(var i=0;i<st.length;i++){if(st[i]!==undefined&&st[i]!==null)obj[i]=st[i];}
-    st=obj;
-  }
-  return{name:p.name||"",st:st};
+function getS(isStaff, i){ return (status[cur] && status[cur][key(isStaff,i)]) || ""; }
+
+function tog(isStaff, i, v){
+  if(!status[cur]) status[cur] = {};
+  var k = key(isStaff, i);
+  status[cur][k] = (status[cur][k] === v ? "" : v);
+  db.ref("status/" + cur).set(status[cur]);
+  draw();
 }
+window.sp = function(i,v){ tog(false,i,v); };
+window.ss = function(i,v){ tog(true,i,v); };
 
-function ini(n){return n.split(" ").map(function(w){return w[0];}).join("").slice(0,2).toUpperCase();}
-function tog(arr,i,v){
-  var cur_val=arr[i].st[cur]||"";
-  arr[i].st[cur]=(cur_val===v?"":v);
-  save();draw();
-}
-window.sp=function(i,v){tog(pl,i,v);};
-window.ss=function(i,v){tog(sl,i,v);};
+function ini(n){ return n.split(" ").map(function(w){return w[0];}).join("").slice(0,2).toUpperCase(); }
 
-function mkList(el,arr,fn){
-  var h="";
-  for(var i=0;i<arr.length;i++){
-    var s=arr[i].st[cur]||"";
-    h+='<div class="pr"><div class="av">'+ini(arr[i].name)+'</div>'
-      +'<div class="pn">'+arr[i].name+'</div>'
-      +'<div class="sb">'
-      +'<button class="'+(s==="da"?"da":"")+'" onclick="'+fn+'('+i+',\'da\')">&#x2713; Da</button>'
-      +'<button class="'+(s==="en"?"en":"")+'" onclick="'+fn+'('+i+',\'en\')">Entsch.</button>'
-      +'<button class="'+(s==="ab"?"ab":"")+'" onclick="'+fn+'('+i+',\'ab\')">&#x2715; Fehlt</button>'
-      +'</div></div>';
+function mkList(el, names, isStaff){
+  var h = "";
+  for(var i=0;i<names.length;i++){
+    var s = getS(isStaff, i);
+    h += '<div class="pr">'
+       + '<div class="av">' + ini(names[i]) + '</div>'
+       + '<div class="pn">' + names[i] + '</div>'
+       + '<div class="sb">'
+       + '<button class="' + (s==="da"?"da":"") + '" onclick="' + (isStaff?"ss":"sp") + '(' + i + ',\'da\')">&#x2713; Da</button>'
+       + '<button class="' + (s==="en"?"en":"") + '" onclick="' + (isStaff?"ss":"sp") + '(' + i + ',\'en\')">Entsch.</button>'
+       + '<button class="' + (s==="ab"?"ab":"") + '" onclick="' + (isStaff?"ss":"sp") + '(' + i + ',\'ab\')">&#x2715; Fehlt</button>'
+       + '</div></div>';
   }
-  document.getElementById(el).innerHTML=h;
+  document.getElementById(el).innerHTML = h;
 }
 
 function draw(){
-  mkList("plist",pl,"sp");
-  mkList("slist",sl,"ss");
-  var all=pl.concat(sl),da=0,ab=0,en=0;
-  for(var i=0;i<all.length;i++){
-    var s=all[i].st[cur]||"";
-    if(s==="da")da++;else if(s==="ab")ab++;else if(s==="en")en++;
-  }
-  document.getElementById("cnt-da").textContent=da;
-  document.getElementById("cnt-ab").textContent=ab;
-  document.getElementById("cnt-en").textContent=en;
-  buildSBar();
+  mkList("plist", SPIELER, false);
+  mkList("slist", STAFF, true);
+  var da=0,ab=0,en=0;
+  for(var i=0;i<SPIELER.length;i++){var s=getS(false,i);if(s==="da")da++;else if(s==="ab")ab++;else if(s==="en")en++;}
+  for(var j=0;j<STAFF.length;j++){var t=getS(true,j);if(t==="da")da++;else if(t==="ab")ab++;else if(t==="en")en++;}
+  document.getElementById("cnt-da").textContent = da;
+  document.getElementById("cnt-ab").textContent = ab;
+  document.getElementById("cnt-en").textContent = en;
+  buildBar();
 }
 
-function buildSBar(){
-  var bar=document.getElementById("sbar"),h="";
-  for(var i=0;i<sess.length;i++){
-    h+='<button class="tb'+(i===cur?" on":"")+'" onclick="go('+i+')">'+sess[i]+'</button>';
+function buildBar(){
+  var bar = document.getElementById("sbar"), h = "";
+  for(var i=0;i<SESS.length;i++){
+    h += '<button class="tb' + (i===cur?" on":"") + '" onclick="go(' + i + ')">' + SESS[i] + '</button>';
   }
-  bar.innerHTML=h;
-  var a=document.createElement("button");
-  a.className="tb add";a.textContent="+ Termin";
-  a.onclick=function(){
-    var l=prompt("Datum (z.B. Mo. 14.07.):");
-    if(!l)return;
-    sess.push(l);save();go(sess.length-1);
+  bar.innerHTML = h;
+  var a = document.createElement("button");
+  a.className = "tb add"; a.textContent = "+ Termin";
+  a.onclick = function(){
+    var l = prompt("Datum (z.B. Mo. 14.07.):");
+    if(!l) return;
+    SESS.push(l);
+    go(SESS.length - 1);
   };
   bar.appendChild(a);
 }
 
 function go(i){
-  cur=i;
-  document.getElementById("slabel").textContent="Vorbereitung 26/27 \u00b7 "+sess[i];
+  cur = i;
+  document.getElementById("slabel").textContent = "Vorbereitung 26/27 \u00b7 " + SESS[i];
   draw();
 }
 
-function toFirebase(arr){
-  // st als normales Objekt mit String-Keys speichern
-  return arr.map(function(p){
-    var st={};
-    Object.keys(p.st).forEach(function(k){st["k"+k]=p.st[k];});
-    return{name:p.name,st:st};
-  });
-}
-
-function fromFirebase(arr){
-  return arr.map(function(p){
-    var raw=fixSt(p);
-    var st={};
-    Object.keys(raw.st).forEach(function(k){
-      var ki=k.replace(/^k/,"");
-      st[ki]=raw.st[k];
-    });
-    return{name:raw.name,st:st};
-  });
-}
-
-function save(){
-  db.ref("anwesenheit").set({
-    pl:toFirebase(pl),
-    sl:toFirebase(sl),
-    sess:sess
-  });
-}
-
-function startListening(){
-  if(listening)return;
-  listening=true;
-  db.ref("anwesenheit").on("value",function(snap){
-    var data=snap.val();
-    if(data&&data.pl&&data.pl.length){
-      pl=fromFirebase(data.pl);
-      if(data.sl&&data.sl.length) sl=fromFirebase(data.sl);
-      if(data.sess&&data.sess.length) sess=data.sess;
-      draw();
-    }
-  });
-}
+// Firebase: nur Anwesenheits-Status live sync
+db.ref("status").on("value", function(snap){
+  var data = snap.val();
+  status = data || {};
+  document.getElementById("dot").classList.add("on");
+  draw();
+});
 
 function addP(){
-  var n=document.getElementById("nn").value.trim();
-  if(!n)return;
-  pl.push({name:n,st:{}});
-  document.getElementById("nn").value="";
-  save();draw();toast(n+" hinzugef\u00fcgt");
+  var n = document.getElementById("nn").value.trim();
+  if(!n) return;
+  SPIELER.push(n);
+  document.getElementById("nn").value = "";
+  draw();
+  toast(n + " hinzugef\u00fcgt");
 }
 
 function doExport(){
   var da=[],ab=[],en=[];
-  for(var i=0;i<pl.length;i++){
-    var s=pl[i].st[cur]||"";
-    if(s==="da")da.push(pl[i].name);
-    else if(s==="ab")ab.push(pl[i].name);
-    else if(s==="en")en.push(pl[i].name);
+  for(var i=0;i<SPIELER.length;i++){
+    var s=getS(false,i);
+    if(s==="da")da.push(SPIELER[i]);
+    else if(s==="ab")ab.push(SPIELER[i]);
+    else if(s==="en")en.push(SPIELER[i]);
   }
-  var txt="FC Kickers Leer \u2013 Vorbereitung 26/27\n"+sess[cur]+"\n\n\u2705 Dabei ("+da.length+"):\n"+(da.join("\n")||"\u2014")+"\n\n\u274c Fehlt ("+ab.length+"):\n"+(ab.join("\n")||"\u2014")+"\n\n\u26a0\ufe0f Entschuldigt ("+en.length+"):\n"+(en.join("\n")||"\u2014");
-  if(navigator.clipboard&&navigator.clipboard.writeText){
+  var txt = "FC Kickers Leer \u2013 Vorbereitung 26/27\n" + SESS[cur]
+    + "\n\n\u2705 Dabei (" + da.length + "):\n" + (da.join("\n")||"\u2014")
+    + "\n\n\u274c Fehlt (" + ab.length + "):\n" + (ab.join("\n")||"\u2014")
+    + "\n\n\u26a0\ufe0f Entschuldigt (" + en.length + "):\n" + (en.join("\n")||"\u2014");
+  if(navigator.clipboard && navigator.clipboard.writeText){
     navigator.clipboard.writeText(txt).then(function(){toast("Kopiert!");}).catch(function(){fb(txt);});
-  }else{fb(txt);}
+  } else { fb(txt); }
 }
 function fb(t){var x=document.createElement("textarea");x.value=t;x.style.cssText="position:fixed;opacity:0;";document.body.appendChild(x);x.select();try{document.execCommand("copy");toast("Kopiert!");}catch(e){alert(t);}document.body.removeChild(x);}
 function toast(m){var t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(function(){t.classList.remove("show");},2200);}
 
-// Beim Start: Firebase laden, dann live hören
-db.ref("anwesenheit").once("value",function(snap){
-  var data=snap.val();
-  if(data&&data.pl&&data.pl.length){
-    pl=fromFirebase(data.pl);
-    if(data.sl&&data.sl.length) sl=fromFirebase(data.sl);
-    if(data.sess&&data.sess.length) sess=data.sess;
-  } else {
-    save(); // Standarddaten in Firebase schreiben
-  }
-  document.getElementById("dot").classList.add("on");
-  go(0);
-  startListening();
-});
+// Direkt zeichnen ohne auf Firebase zu warten
+draw();
+go(0);
 </script>
 </body>
 </html>
