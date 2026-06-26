@@ -105,12 +105,12 @@ function tog(isStaff,i,v){
   if(!status[cur]) status[cur]={};
   var key=k(isStaff,i);
   var cur_val=status[cur][key]||"";
-  // lokal sofort setzen
   status[cur][key] = (cur_val===v ? "" : v);
-  // sofort zeichnen
   draw();
-  // dann Firebase
-  db.ref("st/"+cur+"/"+key).set(status[cur][key]||null);
+  saving=true;
+  db.ref("st/"+cur+"/"+key).set(status[cur][key]||null,function(){
+    setTimeout(function(){saving=false;},1500);
+  });
 }
 window.sp=function(i,v){tog(false,i,v);};
 window.ss=function(i,v){tog(true,i,v);};
@@ -164,12 +164,13 @@ function go(i){
   draw();
 }
 
-// Firebase live sync — nur Status laden, Namen kommen aus App
+// Firebase live sync
+var saving=false;
 db.ref("st").on("value",function(snap){
-  var data=snap.val()||{};
-  // Nur übernehmen wenn nicht gerade wir selbst gespeichert haben
-  status=data;
   document.getElementById("dot").classList.add("on");
+  if(saving) return; // eigenes Echo ignorieren
+  var data=snap.val()||{};
+  status=data;
   draw();
 });
 
