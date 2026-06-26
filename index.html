@@ -7,23 +7,23 @@
 <meta name="apple-mobile-web-app-title" content="Kickers Leer">
 <title>FC Kickers Leer</title>
 <style>
-:root{--green:#1D9E75;--green-light:#d1f0e5;--green-dark:#0F6E56;--red:#E24B4A;--red-light:#fde8e8;--amber:#BA7517;--amber-light:#fef0d5;--bg:#F4F4F2;--card:#fff;--text:#1a1a1a;--muted:#6b6b6b;--border:rgba(0,0,0,0.11);--r:12px;}
-@media(prefers-color-scheme:dark){:root{--bg:#111;--card:#1e1e1e;--text:#f0f0f0;--muted:#999;--border:rgba(255,255,255,0.11);--green-light:#04342C;--red-light:#3a1010;--amber-light:#2e1c05;}}
+:root{--green:#1D9E75;--gl:#d1f0e5;--gd:#0F6E56;--red:#E24B4A;--rl:#fde8e8;--amb:#BA7517;--al:#fef0d5;--bg:#F4F4F2;--card:#fff;--text:#1a1a1a;--muted:#6b6b6b;--border:rgba(0,0,0,0.11);--r:12px;}
+@media(prefers-color-scheme:dark){:root{--bg:#111;--card:#1e1e1e;--text:#f0f0f0;--muted:#999;--border:rgba(255,255,255,0.11);--gl:#04342C;--rl:#3a1010;--al:#2e1c05;}}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);}
 header{background:var(--green);color:#fff;padding:14px 16px;position:sticky;top:0;z-index:9;}
 header h1{font-size:17px;font-weight:600;}
-header p{font-size:12px;opacity:.8;margin-top:2px;display:flex;align-items:center;gap:6px;}
-.dot{width:7px;height:7px;border-radius:50%;background:#fff;opacity:.5;display:inline-block;}
-.dot.on{opacity:1;background:#a8ffdc;}
+header p{font-size:12px;opacity:.8;margin-top:2px;}
+.dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.4);display:inline-block;margin-right:5px;vertical-align:middle;}
+.dot.on{background:#a8ffdc;}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 12px 0;}
 .stat{background:var(--card);border-radius:10px;padding:10px 6px;text-align:center;}
 .stat .n{font-size:26px;font-weight:700;}
 .stat .l{font-size:11px;color:var(--muted);}
-#cnt-da{color:var(--green);}#cnt-ab{color:var(--red);}#cnt-en{color:var(--amber);}
+#cnt-da{color:var(--green);}#cnt-ab{color:var(--red);}#cnt-en{color:var(--amb);}
 .sw{padding:10px 12px 0;}
-.sb-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;}
-.sb-row::-webkit-scrollbar{display:none;}
+.sr{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;}
+.sr::-webkit-scrollbar{display:none;}
 .tb{border:1px solid var(--border);border-radius:20px;padding:6px 13px;font-size:13px;background:var(--card);color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;}
 .tb.on{background:var(--green);border-color:var(--green);color:#fff;font-weight:600;}
 .tb.add{border-style:dashed;}
@@ -34,9 +34,9 @@ header p{font-size:12px;opacity:.8;margin-top:2px;display:flex;align-items:cente
 .pn{flex:1;font-size:13px;font-weight:500;}
 .sb{display:flex;gap:3px;}
 .sb button{border:1px solid var(--border);border-radius:7px;padding:5px 8px;font-size:12px;cursor:pointer;background:transparent;color:var(--muted);font-weight:500;}
-.sb button.da{background:var(--green-light);border-color:var(--green);color:var(--green-dark);}
-.sb button.ab{background:var(--red-light);border-color:var(--red);color:var(--red);}
-.sb button.en{background:var(--amber-light);border-color:var(--amber);color:var(--amber);}
+.sb button.da{background:var(--gl);border-color:var(--green);color:var(--gd);}
+.sb button.ab{background:var(--rl);border-color:var(--red);color:var(--red);}
+.sb button.en{background:var(--al);border-color:var(--amb);color:var(--amb);}
 .ai{padding:12px 12px 4px;display:flex;gap:6px;}
 .ai input{flex:1;border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:14px;background:var(--card);color:var(--text);}
 .ai button{border:none;border-radius:10px;padding:9px 15px;font-size:17px;background:var(--green);color:#fff;cursor:pointer;}
@@ -49,14 +49,14 @@ header p{font-size:12px;opacity:.8;margin-top:2px;display:flex;align-items:cente
 <body>
 <header>
   <h1>&#x26BD; FC Kickers Leer</h1>
-  <p><span class="dot" id="dot"></span><span id="slabel">Vorbereitung 26/27</span></p>
+  <p><span class="dot" id="dot"></span><span id="slabel">Vorbereitung 26/27 &middot; wird geladen...</span></p>
 </header>
 <div class="stats">
-  <div class="stat"><div class="n" id="cnt-da">0</div><div class="l">Dabei</div></div>
-  <div class="stat"><div class="n" id="cnt-ab">0</div><div class="l">Fehlt</div></div>
-  <div class="stat"><div class="n" id="cnt-en">0</div><div class="l">Entsch.</div></div>
+  <div class="stat"><div class="n" id="cnt-da">-</div><div class="l">Dabei</div></div>
+  <div class="stat"><div class="n" id="cnt-ab">-</div><div class="l">Fehlt</div></div>
+  <div class="stat"><div class="n" id="cnt-en">-</div><div class="l">Entsch.</div></div>
 </div>
-<div class="sw"><div class="sb-row" id="sbar"></div></div>
+<div class="sw"><div class="sr" id="sbar"></div></div>
 <div class="sl">Spieler</div>
 <div class="pl" id="plist"></div>
 <div class="sl">Trainerstab &amp; Betreuer</div>
@@ -68,11 +68,10 @@ header p{font-size:12px;opacity:.8;margin-top:2px;display:flex;align-items:cente
 <div class="ep"><button onclick="doExport()">&#x1F4CB; Liste kopieren</button></div>
 <div id="toast"></div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-const firebaseConfig = {
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+firebase.initializeApp({
   apiKey: "AIzaSyAyWwFs2a9Fv9hVu-mDbfsKUDBGNiwKewg",
   authDomain: "kickers-a6150.firebaseapp.com",
   databaseURL: "https://kickers-a6150-default-rtdb.europe-west1.firebasedatabase.app",
@@ -80,29 +79,23 @@ const firebaseConfig = {
   storageBucket: "kickers-a6150.firebasestorage.app",
   messagingSenderId: "544380591297",
   appId: "1:544380591297:web:9f908968ee054c9d45c840"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+});
+var db = firebase.database();
 
 var DATES=[46199,46200,46201,46204,46206,46208,46209,46211,46213,46215,46216,46218,46220,46222,46223,46225,46227];
 function fd(s){var d=new Date((s-25569)*86400*1000);return d.toLocaleDateString("de-DE",{weekday:"short",day:"2-digit",month:"2-digit"});}
-var sess=DATES.map(function(s){return fd(s);});
+var sess=DATES.map(fd);
 var cur=0;
 
 var DP=["John Lucker","Mirco Behle","S\u00f6ren Bu\u00df","Erhan Colak","Marvin Dunayski","Jann Melcher","Mo Juma","Khaled Algarad","Ridvan Karakurt","Timo L\u00fcdemann","Aron M\u00fcseler","Noah Omar-Diriye","Gerrit Remmers","Jonas Weber","Manuel Westmark","Passo Wagner","Rojhat \u00d6zdemir"];
 var DS=["Basti Fischer","Holger Dunayski","Micha","Christian"];
-
 var pl=DP.map(function(n){return{name:n,st:{}};});
 var sl=DS.map(function(n){return{name:n,st:{}};});
-var synced=false;
+var loaded=false;
 
 function ini(n){return n.split(" ").map(function(w){return w[0];}).join("").slice(0,2).toUpperCase();}
 
-function tog(arr,i,v){
-  arr[i].st[cur]=(arr[i].st[cur]===v?"":v);
-  save();draw();
-}
+function tog(arr,i,v){arr[i].st[cur]=(arr[i].st[cur]===v?"":v);save();draw();}
 window.sp=function(i,v){tog(pl,i,v);};
 window.ss=function(i,v){tog(sl,i,v);};
 
@@ -111,12 +104,12 @@ function mkList(el,arr,fn){
   for(var i=0;i<arr.length;i++){
     var s=arr[i].st[cur]||"";
     h+='<div class="pr"><div class="av">'+ini(arr[i].name)+'</div>'
-     +'<div class="pn">'+arr[i].name+'</div>'
-     +'<div class="sb">'
-     +'<button class="'+(s==="da"?"da":"")+'" onclick="'+fn+'('+i+',\'da\')">&#x2713; Da</button>'
-     +'<button class="'+(s==="en"?"en":"")+'" onclick="'+fn+'('+i+',\'en\')">Entsch.</button>'
-     +'<button class="'+(s==="ab"?"ab":"")+'" onclick="'+fn+'('+i+',\'ab\')">&#x2715; Fehlt</button>'
-     +'</div></div>';
+      +'<div class="pn">'+arr[i].name+'</div>'
+      +'<div class="sb">'
+      +'<button class="'+(s==="da"?"da":"")+'" onclick="'+fn+'('+i+',\'da\')">&#x2713; Da</button>'
+      +'<button class="'+(s==="en"?"en":"")+'" onclick="'+fn+'('+i+',\'en\')">Entsch.</button>'
+      +'<button class="'+(s==="ab"?"ab":"")+'" onclick="'+fn+'('+i+',\'ab\')">&#x2715; Fehlt</button>'
+      +'</div></div>';
   }
   document.getElementById(el).innerHTML=h;
 }
@@ -133,8 +126,7 @@ function draw(){
 }
 
 function buildSBar(){
-  var bar=document.getElementById("sbar");
-  var h="";
+  var bar=document.getElementById("sbar"),h="";
   for(var i=0;i<sess.length;i++){
     h+='<button class="tb'+(i===cur?" on":"")+'" onclick="go('+i+')">'+sess[i]+'</button>';
   }
@@ -151,6 +143,26 @@ function go(i){
   draw();
 }
 
+function save(){
+  db.ref("anwesenheit").set({pl:pl,sl:sl,sess:sess});
+}
+
+db.ref("anwesenheit").on("value",function(snap){
+  var data=snap.val();
+  if(data){
+    if(data.pl&&data.pl.length) pl=data.pl;
+    if(data.sl&&data.sl.length) sl=data.sl;
+    if(data.sess&&data.sess.length) sess=data.sess;
+  }
+  if(!loaded){
+    loaded=true;
+    document.getElementById("dot").classList.add("on");
+    go(0);
+  } else {
+    draw();
+  }
+});
+
 function addP(){
   var n=document.getElementById("nn").value.trim();
   if(!n)return;
@@ -166,25 +178,7 @@ function doExport(){
   if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){toast("Kopiert!");}).catch(function(){fb(txt);});}else{fb(txt);}
 }
 function fb(t){var x=document.createElement("textarea");x.value=t;x.style.cssText="position:fixed;opacity:0;";document.body.appendChild(x);x.select();try{document.execCommand("copy");toast("Kopiert!");}catch(e){alert(t);}document.body.removeChild(x);}
-
 function toast(m){var t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(function(){t.classList.remove("show");},2200);}
-
-function save(){
-  set(ref(db,"anwesenheit"),{pl:pl,sl:sl,sess:sess});
-}
-
-onValue(ref(db,"anwesenheit"),function(snapshot){
-  var data=snapshot.val();
-  if(data){
-    if(data.pl&&data.pl.length){pl=data.pl;}
-    if(data.sl&&data.sl.length){sl=data.sl;}
-    if(data.sess&&data.sess.length){sess=data.sess;}
-  }
-  if(!synced){synced=true;document.getElementById("dot").classList.add("on");}
-  draw();
-});
-
-go(0);
 </script>
 </body>
 </html>
