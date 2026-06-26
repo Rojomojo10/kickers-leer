@@ -122,7 +122,7 @@ function mkList(el,names,isStaff){
   for(var i=0;i<names.length;i++){
     var s=getS(isStaff,i);
     var fn=isStaff?"ss":"sp";
-    h+='<div class="pr '+s+'">'
+    h+='<div class="pr'+(s?' '+s:'')+'">'
       +'<div class="av">'+ini(names[i])+'</div>'
       +'<div class="pn">'+names[i]+'</div>'
       +'<div class="sb">'
