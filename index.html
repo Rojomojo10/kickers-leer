@@ -72,7 +72,9 @@ header p{font-size:12px;opacity:.85;margin-top:3px;display:flex;align-items:cent
 <div class="ep"><button onclick="doExport()">&#x1F4CB; Liste kopieren</button></div>
 <div id="toast"></div>
 <script>
-var GS = "https://script.google.com/macros/s/AKfycbyHUi68dFMedT6A2JEVFnZuQvOXj6foSYdqCzdyOwcfm_ee92E0UOPlQF-rJdXuaflg/exec";
+var BIN_ID = "6a3e54b8f5f4af5e29339a1d";
+var API_KEY = "\$2a\$10\$SEN9zX9YCk.Rl0n.YT7.Qu9999spu1WaaLFRv6zZJo4R8AN2gL0ne";
+var BIN_URL = "https://api.jsonbin.io/v3/b/" + BIN_ID;
 
 var SPIELER = ["John Lucker","Mirco Behle","S\u00f6ren Bu\u00df","Erhan Colak","Marvin Dunayski","Jann Melcher","Mo Juma","Khaled Algarad","Ridvan Karakurt","Timo L\u00fcdemann","Aron M\u00fcseler","Noah Omar-Diriye","Gerrit Remmers","Jonas Weber","Manuel Westmark","Passo Wagner","Rojhat \u00d6zdemir"];
 var STAFF   = ["Basti Fischer","Holger Dunayski","Micha","Christian"];
@@ -80,8 +82,6 @@ var DATES   = [46199,46200,46201,46204,46206,46208,46209,46211,46213,46215,46216
 function fd(s){var d=new Date((s-25569)*86400*1000);return d.toLocaleDateString("de-DE",{weekday:"short",day:"2-digit",month:"2-digit"});}
 var SESS = DATES.map(fd);
 var cur = 0;
-
-// status[sessIdx_playerKey] = "da"|"ab"|"en"
 var status = {};
 
 function k(isStaff,i){ return cur+"_"+(isStaff?"s":"p")+i; }
@@ -89,9 +89,9 @@ function getS(isStaff,i){ return status[k(isStaff,i)]||""; }
 
 function tog(isStaff,i,v){
   var key=k(isStaff,i);
-  status[key] = (status[key]===v ? "" : v);
+  status[key]=(status[key]===v?"":v);
   draw();
-  saveToSheet();
+  saveData();
 }
 window.sp=function(i,v){tog(false,i,v);};
 window.ss=function(i,v){tog(true,i,v);};
@@ -145,28 +145,27 @@ function go(i){
   draw();
 }
 
-// Google Sheets speichern
-function saveToSheet(){
-  var rows=[["key","value"]];
-  Object.keys(status).forEach(function(k){if(status[k])rows.push([k,status[k]]);});
-  fetch(GS,{method:"POST",body:JSON.stringify(rows)}).catch(function(){});
+function saveData(){
+  fetch(BIN_URL,{
+    method:"PUT",
+    headers:{"Content-Type":"application/json","X-Master-Key":API_KEY},
+    body:JSON.stringify({status:status})
+  }).catch(function(){});
 }
 
-// Google Sheets laden
-function loadFromSheet(){
-  fetch(GS+"?t="+Date.now())
-    .then(function(r){return r.json();})
-    .then(function(rows){
-      status={};
-      for(var i=1;i<rows.length;i++){
-        if(rows[i][0]&&rows[i][1]) status[rows[i][0]]=rows[i][1];
-      }
-      document.getElementById("dot").classList.add("on");
-      draw();
-    })
-    .catch(function(){
-      document.getElementById("slabel").textContent="Vorbereitung 26/27 \u00b7 offline";
-    });
+function loadData(){
+  fetch(BIN_URL+"/latest",{
+    headers:{"X-Master-Key":API_KEY}
+  })
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if(d.record&&d.record.status) status=d.record.status;
+    document.getElementById("dot").classList.add("on");
+    draw();
+  })
+  .catch(function(){
+    document.getElementById("slabel").textContent="Vorbereitung 26/27 \u00b7 offline";
+  });
 }
 
 function addP(){
@@ -186,12 +185,10 @@ function doExport(){
 function fb(t){var x=document.createElement("textarea");x.value=t;x.style.cssText="position:fixed;opacity:0;";document.body.appendChild(x);x.select();try{document.execCommand("copy");toast("Kopiert!");}catch(e){alert(t);}document.body.removeChild(x);}
 function toast(m){var t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(function(){t.classList.remove("show");},2200);}
 
-// Start
 draw();
 go(0);
-loadFromSheet();
-// alle 30 Sekunden neu laden für Sync
-setInterval(loadFromSheet, 30000);
+loadData();
+setInterval(loadData,30000);
 </script>
 </body>
 </html>
