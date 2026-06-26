@@ -85,7 +85,6 @@ var db=firebase.database();
 var DATES=[46199,46200,46201,46204,46206,46208,46209,46211,46213,46215,46216,46218,46220,46222,46223,46225,46227];
 function fd(s){var d=new Date((s-25569)*86400*1000);return d.toLocaleDateString("de-DE",{weekday:"short",day:"2-digit",month:"2-digit"});}
 
-// Standarddaten — werden verwendet wenn Firebase leer ist
 var DEFAULT_SESS=DATES.map(fd);
 var DEFAULT_PL=["John Lucker","Mirco Behle","S\u00f6ren Bu\u00df","Erhan Colak","Marvin Dunayski","Jann Melcher","Mo Juma","Khaled Algarad","Ridvan Karakurt","Timo L\u00fcdemann","Aron M\u00fcseler","Noah Omar-Diriye","Gerrit Remmers","Jonas Weber","Manuel Westmark","Passo Wagner","Rojhat \u00d6zdemir"];
 var DEFAULT_SL=["Basti Fischer","Holger Dunayski","Micha","Christian"];
@@ -94,10 +93,27 @@ var sess=DEFAULT_SESS.slice();
 var pl=DEFAULT_PL.map(function(n){return{name:n,st:{}};});
 var sl=DEFAULT_SL.map(function(n){return{name:n,st:{}};});
 var cur=0;
-var loaded=false;
+var listening=false;
+
+// Firebase Array → sauberes Objekt konvertieren
+function fixSt(p){
+  if(!p||typeof p!=="object") return{name:p||"",st:{}};
+  var st=p.st||{};
+  // Falls Firebase Array draus gemacht hat, in Objekt umwandeln
+  if(Array.isArray(st)){
+    var obj={};
+    for(var i=0;i<st.length;i++){if(st[i]!==undefined&&st[i]!==null)obj[i]=st[i];}
+    st=obj;
+  }
+  return{name:p.name||"",st:st};
+}
 
 function ini(n){return n.split(" ").map(function(w){return w[0];}).join("").slice(0,2).toUpperCase();}
-function tog(arr,i,v){arr[i].st[cur]=(arr[i].st[cur]===v?"":v);save();draw();}
+function tog(arr,i,v){
+  var cur_val=arr[i].st[cur]||"";
+  arr[i].st[cur]=(cur_val===v?"":v);
+  save();draw();
+}
 window.sp=function(i,v){tog(pl,i,v);};
 window.ss=function(i,v){tog(sl,i,v);};
 
@@ -120,7 +136,10 @@ function draw(){
   mkList("plist",pl,"sp");
   mkList("slist",sl,"ss");
   var all=pl.concat(sl),da=0,ab=0,en=0;
-  for(var i=0;i<all.length;i++){var s=all[i].st[cur]||"";if(s==="da")da++;else if(s==="ab")ab++;else if(s==="en")en++;}
+  for(var i=0;i<all.length;i++){
+    var s=all[i].st[cur]||"";
+    if(s==="da")da++;else if(s==="ab")ab++;else if(s==="en")en++;
+  }
   document.getElementById("cnt-da").textContent=da;
   document.getElementById("cnt-ab").textContent=ab;
   document.getElementById("cnt-en").textContent=en;
@@ -135,7 +154,11 @@ function buildSBar(){
   bar.innerHTML=h;
   var a=document.createElement("button");
   a.className="tb add";a.textContent="+ Termin";
-  a.onclick=function(){var l=prompt("Datum (z.B. Mo. 14.07.):");if(!l)return;sess.push(l);save();go(sess.length-1);};
+  a.onclick=function(){
+    var l=prompt("Datum (z.B. Mo. 14.07.):");
+    if(!l)return;
+    sess.push(l);save();go(sess.length-1);
+  };
   bar.appendChild(a);
 }
 
@@ -145,8 +168,47 @@ function go(i){
   draw();
 }
 
+function toFirebase(arr){
+  // st als normales Objekt mit String-Keys speichern
+  return arr.map(function(p){
+    var st={};
+    Object.keys(p.st).forEach(function(k){st["k"+k]=p.st[k];});
+    return{name:p.name,st:st};
+  });
+}
+
+function fromFirebase(arr){
+  return arr.map(function(p){
+    var raw=fixSt(p);
+    var st={};
+    Object.keys(raw.st).forEach(function(k){
+      var ki=k.replace(/^k/,"");
+      st[ki]=raw.st[k];
+    });
+    return{name:raw.name,st:st};
+  });
+}
+
 function save(){
-  db.ref("anwesenheit").set({pl:pl,sl:sl,sess:sess});
+  db.ref("anwesenheit").set({
+    pl:toFirebase(pl),
+    sl:toFirebase(sl),
+    sess:sess
+  });
+}
+
+function startListening(){
+  if(listening)return;
+  listening=true;
+  db.ref("anwesenheit").on("value",function(snap){
+    var data=snap.val();
+    if(data&&data.pl&&data.pl.length){
+      pl=fromFirebase(data.pl);
+      if(data.sl&&data.sl.length) sl=fromFirebase(data.sl);
+      if(data.sess&&data.sess.length) sess=data.sess;
+      draw();
+    }
+  });
 }
 
 function addP(){
@@ -159,40 +221,33 @@ function addP(){
 
 function doExport(){
   var da=[],ab=[],en=[];
-  for(var i=0;i<pl.length;i++){var s=pl[i].st[cur]||"";if(s==="da")da.push(pl[i].name);else if(s==="ab")ab.push(pl[i].name);else if(s==="en")en.push(pl[i].name);}
+  for(var i=0;i<pl.length;i++){
+    var s=pl[i].st[cur]||"";
+    if(s==="da")da.push(pl[i].name);
+    else if(s==="ab")ab.push(pl[i].name);
+    else if(s==="en")en.push(pl[i].name);
+  }
   var txt="FC Kickers Leer \u2013 Vorbereitung 26/27\n"+sess[cur]+"\n\n\u2705 Dabei ("+da.length+"):\n"+(da.join("\n")||"\u2014")+"\n\n\u274c Fehlt ("+ab.length+"):\n"+(ab.join("\n")||"\u2014")+"\n\n\u26a0\ufe0f Entschuldigt ("+en.length+"):\n"+(en.join("\n")||"\u2014");
-  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){toast("Kopiert!");}).catch(function(){fb(txt);});}else{fb(txt);}
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(function(){toast("Kopiert!");}).catch(function(){fb(txt);});
+  }else{fb(txt);}
 }
 function fb(t){var x=document.createElement("textarea");x.value=t;x.style.cssText="position:fixed;opacity:0;";document.body.appendChild(x);x.select();try{document.execCommand("copy");toast("Kopiert!");}catch(e){alert(t);}document.body.removeChild(x);}
 function toast(m){var t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(function(){t.classList.remove("show");},2200);}
 
-// Firebase laden — bei leerer DB Standarddaten eintragen
+// Beim Start: Firebase laden, dann live hören
 db.ref("anwesenheit").once("value",function(snap){
   var data=snap.val();
   if(data&&data.pl&&data.pl.length){
-    // Daten aus Firebase übernehmen
-    pl=data.pl;
-    if(data.sl&&data.sl.length) sl=data.sl;
+    pl=fromFirebase(data.pl);
+    if(data.sl&&data.sl.length) sl=fromFirebase(data.sl);
     if(data.sess&&data.sess.length) sess=data.sess;
   } else {
-    // Firebase ist leer — Standarddaten speichern
-    save();
+    save(); // Standarddaten in Firebase schreiben
   }
-  loaded=true;
   document.getElementById("dot").classList.add("on");
   go(0);
-
-  // Ab jetzt live Updates hören
-  db.ref("anwesenheit").on("value",function(s2){
-    if(!loaded) return;
-    var d=s2.val();
-    if(d&&d.pl&&d.pl.length){
-      pl=d.pl;
-      if(d.sl&&d.sl.length) sl=d.sl;
-      if(d.sess&&d.sess.length) sess=d.sess;
-      draw();
-    }
-  });
+  startListening();
 });
 </script>
 </body>
