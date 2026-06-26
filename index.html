@@ -72,29 +72,31 @@ header p{font-size:12px;opacity:.8;margin-top:2px;}
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script>
 firebase.initializeApp({
-  apiKey: "AIzaSyAyWwFs2a9Fv9hVu-mDbfsKUDBGNiwKewg",
-  authDomain: "kickers-a6150.firebaseapp.com",
-  databaseURL: "https://kickers-a6150-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "kickers-a6150",
-  storageBucket: "kickers-a6150.firebasestorage.app",
-  messagingSenderId: "544380591297",
-  appId: "1:544380591297:web:9f908968ee054c9d45c840"
+  apiKey:"AIzaSyAyWwFs2a9Fv9hVu-mDbfsKUDBGNiwKewg",
+  authDomain:"kickers-a6150.firebaseapp.com",
+  databaseURL:"https://kickers-a6150-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:"kickers-a6150",
+  storageBucket:"kickers-a6150.firebasestorage.app",
+  messagingSenderId:"544380591297",
+  appId:"1:544380591297:web:9f908968ee054c9d45c840"
 });
-var db = firebase.database();
+var db=firebase.database();
 
 var DATES=[46199,46200,46201,46204,46206,46208,46209,46211,46213,46215,46216,46218,46220,46222,46223,46225,46227];
 function fd(s){var d=new Date((s-25569)*86400*1000);return d.toLocaleDateString("de-DE",{weekday:"short",day:"2-digit",month:"2-digit"});}
-var sess=DATES.map(fd);
-var cur=0;
 
-var DP=["John Lucker","Mirco Behle","S\u00f6ren Bu\u00df","Erhan Colak","Marvin Dunayski","Jann Melcher","Mo Juma","Khaled Algarad","Ridvan Karakurt","Timo L\u00fcdemann","Aron M\u00fcseler","Noah Omar-Diriye","Gerrit Remmers","Jonas Weber","Manuel Westmark","Passo Wagner","Rojhat \u00d6zdemir"];
-var DS=["Basti Fischer","Holger Dunayski","Micha","Christian"];
-var pl=DP.map(function(n){return{name:n,st:{}};});
-var sl=DS.map(function(n){return{name:n,st:{}};});
+// Standarddaten — werden verwendet wenn Firebase leer ist
+var DEFAULT_SESS=DATES.map(fd);
+var DEFAULT_PL=["John Lucker","Mirco Behle","S\u00f6ren Bu\u00df","Erhan Colak","Marvin Dunayski","Jann Melcher","Mo Juma","Khaled Algarad","Ridvan Karakurt","Timo L\u00fcdemann","Aron M\u00fcseler","Noah Omar-Diriye","Gerrit Remmers","Jonas Weber","Manuel Westmark","Passo Wagner","Rojhat \u00d6zdemir"];
+var DEFAULT_SL=["Basti Fischer","Holger Dunayski","Micha","Christian"];
+
+var sess=DEFAULT_SESS.slice();
+var pl=DEFAULT_PL.map(function(n){return{name:n,st:{}};});
+var sl=DEFAULT_SL.map(function(n){return{name:n,st:{}};});
+var cur=0;
 var loaded=false;
 
 function ini(n){return n.split(" ").map(function(w){return w[0];}).join("").slice(0,2).toUpperCase();}
-
 function tog(arr,i,v){arr[i].st[cur]=(arr[i].st[cur]===v?"":v);save();draw();}
 window.sp=function(i,v){tog(pl,i,v);};
 window.ss=function(i,v){tog(sl,i,v);};
@@ -133,7 +135,7 @@ function buildSBar(){
   bar.innerHTML=h;
   var a=document.createElement("button");
   a.className="tb add";a.textContent="+ Termin";
-  a.onclick=function(){var l=prompt("Datum (z.B. Mo. 14.07.):");if(!l)return;sess.push(l);go(sess.length-1);};
+  a.onclick=function(){var l=prompt("Datum (z.B. Mo. 14.07.):");if(!l)return;sess.push(l);save();go(sess.length-1);};
   bar.appendChild(a);
 }
 
@@ -146,22 +148,6 @@ function go(i){
 function save(){
   db.ref("anwesenheit").set({pl:pl,sl:sl,sess:sess});
 }
-
-db.ref("anwesenheit").on("value",function(snap){
-  var data=snap.val();
-  if(data){
-    if(data.pl&&data.pl.length) pl=data.pl;
-    if(data.sl&&data.sl.length) sl=data.sl;
-    if(data.sess&&data.sess.length) sess=data.sess;
-  }
-  if(!loaded){
-    loaded=true;
-    document.getElementById("dot").classList.add("on");
-    go(0);
-  } else {
-    draw();
-  }
-});
 
 function addP(){
   var n=document.getElementById("nn").value.trim();
@@ -179,6 +165,35 @@ function doExport(){
 }
 function fb(t){var x=document.createElement("textarea");x.value=t;x.style.cssText="position:fixed;opacity:0;";document.body.appendChild(x);x.select();try{document.execCommand("copy");toast("Kopiert!");}catch(e){alert(t);}document.body.removeChild(x);}
 function toast(m){var t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(function(){t.classList.remove("show");},2200);}
+
+// Firebase laden — bei leerer DB Standarddaten eintragen
+db.ref("anwesenheit").once("value",function(snap){
+  var data=snap.val();
+  if(data&&data.pl&&data.pl.length){
+    // Daten aus Firebase übernehmen
+    pl=data.pl;
+    if(data.sl&&data.sl.length) sl=data.sl;
+    if(data.sess&&data.sess.length) sess=data.sess;
+  } else {
+    // Firebase ist leer — Standarddaten speichern
+    save();
+  }
+  loaded=true;
+  document.getElementById("dot").classList.add("on");
+  go(0);
+
+  // Ab jetzt live Updates hören
+  db.ref("anwesenheit").on("value",function(s2){
+    if(!loaded) return;
+    var d=s2.val();
+    if(d&&d.pl&&d.pl.length){
+      pl=d.pl;
+      if(d.sl&&d.sl.length) sl=d.sl;
+      if(d.sess&&d.sess.length) sess=d.sess;
+      draw();
+    }
+  });
+});
 </script>
 </body>
 </html>
